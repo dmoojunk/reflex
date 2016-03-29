@@ -1,38 +1,41 @@
-/*
- * reflex mixins
- * --------------------------------------------------
- *
- * --------------------------------------------------
- * reflex grid generation mixins
- * --------------------------------------------------
- */
+// --------------------------------------------------
+// reflex mixins
+// --------------------------------------------------
+//
+// --------------------------------------------------
+// reflex grid generation mixins
+// --------------------------------------------------
 
 @mixin make-reflex-grid($class) {
-    loop-reflex-columns($reflex-columns, $class, width);
+    @include loop-reflex-columns($reflex-columns, $class, width);
 }
 
-@mixin calc-reflex-columns($index, $class, $type) when ($type = width) and ($index > 0) {
-    .${reflex-prefix}${class}${index} {
-        width: percentage(($index / $reflex-columns));
-        *width: percentage(($index / $reflex-columns)) - 0.1;
+@mixin calc-reflex-columns($index, $class, $type) {
+    @if $type == width and $index > 0 {
+        .#{$reflex-prefix}#{$class}#{$index} {
+            width: percentage(($index / $reflex-columns));
+            *width: percentage(($index / $reflex-columns)) - 0.1;
 
-        //for ie6 support you can uncomment this line but it will increase css filesize dramatically
-        //.setupCols();
+            //for ie6 support you can uncomment this line but it will increase css filesize dramatically
+            //.setupCols();
+        }
     }
 }
 
-@mixin loop-reflex-columns($index, $class, $type) when ($index >= 0) {
-    .calc-reflex-columns($index, $class, $type);
-    // next iteration
-    .loop-reflex-columns(($index - 1), $class, $type);
+@mixin loop-reflex-columns($index, $class, $type) {
+    @if $index >= 0 {
+        @include calc-reflex-columns($index, $class, $type);
+        // next iteration
+        @include loop-reflex-columns(($index - 1), $class, $type);
+    }
 }
 
 // defaults for all cols
 @mixin setupCols() {
-    .display-flex();
-    .flex-direction(column);
-    .resetTextAlign();
-    .resetWhitespace();
+    @include display-flex();
+    @include flex-direction(column);
+    @include resetTextAlign();
+    @include resetWhitespace();
     position: relative;
     width: 100%;
     vertical-align: top;
@@ -41,7 +44,7 @@
 
 // defaults for auto cols
 @mixin setupAutoCols() {
-    .flex(1, 0, 0px); // a unit on last value is required by IE10-11
+    @include flex(1, 0, 0px); // a unit on last value is required by IE10-11
     width: auto !important;
     max-width: 100%;
 }
@@ -99,15 +102,17 @@
 }
 
 @mixin make-grid--order-helpers() {
-    .loop-grid--order-helpers($reflex-columns);
+    @include loop-grid--order-helpers($reflex-columns);
 }
 
-@mixin loop-grid--order-helpers($index) when ($index >= 0) {
-    .${reflex-prefix}grid--order-${index} {
-        .order($index);
+@mixin loop-grid--order-helpers($index) {
+    @if $index >= 0 {
+        .#{$reflex-prefix}grid--order-#{$index} {
+            @include order($index);
+        }
+        // next iteration
+        @include loop-grid--order-helpers(($index - 1));
     }
-    // next iteration
-    .loop-grid--order-helpers(($index - 1));
 }
 
 // --------------------------------------------------
@@ -137,10 +142,12 @@
 // flex
 // ---
 
-@mixin flex($grow: 0, $shrink: 1, $basis: auto) when ($basis = 0px) {
-    -ms-flex: $grow $shrink auto; //ie10 needs auto
-    -webkit-flex: $grow $shrink $basis;
-    flex: $grow $shrink $basis;
+@mixin flex($grow: 0, $shrink: 1, $basis: auto) {
+    @if $basis == 0px {
+        -ms-flex: $grow $shrink auto; //ie10 needs auto
+        -webkit-flex: $grow $shrink $basis;
+        flex: $grow $shrink $basis;
+    }
 }
 
 @mixin flex($grow: 0, $shrink: 1, $basis: auto) {
@@ -191,19 +198,19 @@
 // ---
 
 @mixin align-items($align: stretch) {
-    .ms-align-items($align);
+    @include ms-align-items($align);
     -webkit-align-items: $align;
     align-items: $align;
 }
 
 @mixin align-self($align: stretch) {
-    .ms-align-self($align);
+    @include ms-align-self($align);
     -webkit-align-self: $align;
     align-self: $align;
 }
 
 @mixin align-content($align: stretch) {
-    .ms-align-content($align);
+    @include ms-align-content($align);
     -webkit-align-content: $align;
     align-content: $align;
 }
@@ -212,36 +219,48 @@
 // ie10 syntax for align
 // ---
 
-@mixin ms-align-items($align) when ($align = flex-start) {
-    -ms-flex-align: start;
+@mixin ms-align-items($align) {
+    @if $align == flex-start {
+        -ms-flex-align: start;
+    }
 }
 
-@mixin ms-align-items($align) when ($align = flex-end) {
-    -ms-flex-align: end;
+@mixin ms-align-items($align) {
+    @if $align == flex-end {
+        -ms-flex-align: end;
+    }
 }
 
 @mixin ms-align-items($align) {
     -ms-flex-align: $align;
 }
 
-@mixin ms-align-self($align) when ($align = flex-start) {
-    -ms-flex-item-align: start;
+@mixin ms-align-self($align) {
+    @if $align == flex-start {
+        -ms-flex-item-align: start;
+    }
 }
 
-@mixin ms-align-self($align) when ($align = flex-end) {
-    -ms-flex-item-align: end;
+@mixin ms-align-self($align) {
+    @if $align == flex-end {
+        -ms-flex-item-align: end;
+    }
 }
 
 @mixin ms-align-self($align) {
     -ms-flex-item-align: $align;
 }
 
-@mixin ms-align-content($align) when ($align = flex-start) {
-    -ms-flex-line-pack: start;
+@mixin ms-align-content($align) {
+    @if $align == flex-start {
+        -ms-flex-line-pack: start;
+    }
 }
 
-@mixin ms-align-content($align) when ($align = flex-end) {
-    -ms-flex-line-pack: end;
+@mixin ms-align-content($align) {
+    @if $align == flex-end {
+        -ms-flex-line-pack: end;
+    }
 }
 
 @mixin ms-align-content($align) {
